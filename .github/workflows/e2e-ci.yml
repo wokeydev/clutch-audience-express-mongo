@@ -9,15 +9,19 @@ on:
       - main
 
 jobs:
-  test:
+  e2e-tests:
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo:6
-        ports:
-          - 27017:27017
-        options: --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'" --health-interval=10s --health-timeout=5s --health-retries=3
+  services:
+    mongodb:
+      image: mongo:6
+      ports:
+        - 27017:27017
+      options: >-
+        --health-cmd="mongo --eval 'db.runCommand({ ping: 1 })'" 
+        --health-interval=10s 
+        --health-timeout=5s 
+        --health-retries=5
 
     env:
       DB_HOST: localhost
@@ -25,21 +29,25 @@ jobs:
       DB_NAME: test_db
       JWT_SECRET: testsecret
 
-    strategy:
-      matrix:
-        node-version: [16, 18]
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-18-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-18
 
-    - name: Run tests
-      run: npm test
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run e2e tests
+        run: npm run test:e2e

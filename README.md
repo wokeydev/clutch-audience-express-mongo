@@ -38,9 +38,9 @@ docker-compose up --build
 `
     This command will:
 
-                              - Build and start a Mongo container using the specified credentials.
-                              - Build and start the Express container, connecting it to the database.
-                              - The application will be accessible at http://localhost:3000 (or the port specified in .env).
+                                  - Build and start a Mongo container using the specified credentials.
+                                  - Build and start the Express container, connecting it to the database.
+                                  - The application will be accessible at http://localhost:3000 (or the port specified in .env).
 
 2.  Stopping Containers
     To stop the running Docker containers:
