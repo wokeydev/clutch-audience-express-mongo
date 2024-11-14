@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-import config from '../config/auth.config.js';
 import db from '../models/index.js';
 import { generateReferralCode } from '../utils/index.js';
 
@@ -73,7 +72,7 @@ export const signin = async (req, res) => {
       return res.status(401).send({ message: 'Invalid Password!' });
     }
 
-    const token = jwt.sign({ id: user.id }, config.secret, {
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       algorithm: 'HS256',
       allowInsecureKeySizes: true,
       expiresIn: 86400, // 24 hours

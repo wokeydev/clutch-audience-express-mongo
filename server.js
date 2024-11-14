@@ -1,12 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import cookieSession from 'cookie-session';
+import dotenv from 'dotenv';
 
-import dbConfig from './src/config/db.config.js';
 import db from './src/models/index.js';
 import authRoutes from './src/routes/auth.routes.js';
 import userRoutes from './src/routes/user.routes.js';
 
+dotenv.config();
 const app = express();
 
 app.use(cors());
@@ -27,10 +28,13 @@ const Role = db.role;
 
 db.mongoose.set('strictQuery', true);
 db.mongoose
-  .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then(() => {
     console.log('Successfully connect to MongoDB.');
     initial();

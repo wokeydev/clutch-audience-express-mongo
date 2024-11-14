@@ -30,7 +30,7 @@ export const searchUsers = async (req, res) => {
         roles: user.roles.map((role) => 'ROLE_' + role.name.toUpperCase()),
         referralCode: user.referralCode,
         referredBy:
-          user.referredBy.length > 0
+          user.referredBy && user.referredBy.length > 0
             ? {
                 id: user.referredBy[0]._id,
                 email: user.referredBy[0].email,

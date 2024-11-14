@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 
-import config from '../config/auth.config.js';
 import db from '../models/index.js';
 
 const User = db.user;
@@ -13,7 +12,7 @@ const verifyToken = (req, res, next) => {
     return res.status(403).send({ message: 'No token provided!' });
   }
 
-  jwt.verify(token, config.secret, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).send({
         message: 'Unauthorized!',
@@ -27,6 +26,11 @@ const verifyToken = (req, res, next) => {
 const isAdmin = async (req, res, next) => {
   try {
     const user = await User.findById(req.userId).exec();
+    if (!user) {
+      res.status(403).send({ message: 'Require Admin Role!' });
+      return;
+    }
+
     const roles = await Role.find({
       _id: { $in: user.roles },
     });

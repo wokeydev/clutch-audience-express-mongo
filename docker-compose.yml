@@ -1,0 +1,35 @@
+services:
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    env_file:
+      - .env
+    command: ['mongod', '--port', '${DB_PORT}']
+
+  express-app:
+    build: .
+    container_name: express-app
+    restart: always
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '${PORT}:${PORT}'
+    environment:
+      - DB_HOST=mongodb
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+    command: npm start
+
+volumes:
+  mongo-data:
