@@ -1,4 +1,5 @@
-import { verifySignUp } from '../middlewares/index.js';
+import { check } from 'express-validator';
+import { verifySignUp, validateRequest } from '../middlewares/index.js';
 import authController from '../controllers/auth.controller.js';
 
 export default (app) => {
@@ -9,11 +10,28 @@ export default (app) => {
 
   app.post(
     '/api/auth/signup',
-    [verifySignUp.checkDuplicateEmail, verifySignUp.checkRolesExisted],
+    [
+      check('email', 'Please provide a valid email').isEmail(),
+      check('password', 'Password must be at least 5 characters long').isLength(
+        { min: 5 }
+      ),
+      check('roles').optional().isArray(),
+      verifySignUp.checkDuplicateEmail,
+      verifySignUp.checkRolesExisted,
+    ],
+    validateRequest,
     authController.signup
   );
 
-  app.post('/api/auth/signin', authController.signin);
+  app.post(
+    '/api/auth/signin',
+    [
+      check('email', 'Please provide a valid email').isEmail(),
+      check('password', 'Password is required').notEmpty(),
+    ],
+    validateRequest,
+    authController.signin
+  );
 
   app.post('/api/auth/signout', authController.signout);
 };

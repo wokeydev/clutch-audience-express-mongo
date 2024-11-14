@@ -1,0 +1,15 @@
+services:
+  mongodb:
+    image: mongo:6
+    container_name: mongodb-test
+    restart: always
+    volumes:
+      - mongo-test-data:/data/db
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    env_file:
+      - .env.test
+    command: ['mongod', '--port', '${DB_PORT}']
+
+volumes:
+  mongo-test-data:

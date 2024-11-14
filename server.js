@@ -7,7 +7,12 @@ import db from './src/models/index.js';
 import authRoutes from './src/routes/auth.routes.js';
 import userRoutes from './src/routes/user.routes.js';
 
-dotenv.config();
+if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: '.env.test' });
+} else {
+  dotenv.config();
+}
+
 const app = express();
 
 app.use(cors());
@@ -26,33 +31,50 @@ app.use(
 
 const Role = db.role;
 
-db.mongoose.set('strictQuery', true);
-db.mongoose
-  .connect(
-    `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
-  .then(() => {
-    console.log('Successfully connect to MongoDB.');
+let server;
+let isConnected = false;
+
+const connectToDatabase = async () => {
+  try {
+    db.mongoose.set('strictQuery', true);
+    await db.mongoose.connect(
+      `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
+    );
+    console.log('Successfully connected to MongoDB.');
+    isConnected = true;
     initial();
-  })
-  .catch((err) => {
-    console.error('Connection error', err);
-    process.exit();
+  } catch (err) {
+    console.error('Connection error:', err);
+    process.exit(1);
+  }
+};
+
+const disconnectDatabase = async () => {
+  if (isConnected) {
+    await db.mongoose.connection.close();
+    console.log('Disconnected from MongoDB');
+  }
+};
+
+const startServer = () => {
+  const PORT = process.env.PORT || 3000;
+  server = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}.`);
   });
+  authRoutes(app);
+  userRoutes(app);
+};
 
-// routes
-authRoutes(app);
-userRoutes(app);
-
-// set port, listen for requests
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+const stopServer = () => {
+  if (server) {
+    server.close();
+    console.log('Express server closed.');
+  }
+};
 
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
@@ -79,3 +101,11 @@ function initial() {
     }
   });
 }
+
+if (process.env.NODE_ENV !== 'test') {
+  connectToDatabase().then(() => {
+    startServer();
+  });
+}
+
+export { app, connectToDatabase, disconnectDatabase, startServer, stopServer };

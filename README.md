@@ -17,14 +17,14 @@ This project is a Express-based application designed for the Clutch Assessment, 
 1. Install Packages
    Install the necessary packages using npm:
    `bash
-    npm install
-    `
+npm install
+`
 
 2. Running the Server in Development Mode
    Start the Express application in development mode:
    `bash
-    npm run start
-    `
+npm run start
+`
    This will start the server on the port specified in your .env file (default is 3000).
 
 ### Docker Setup
@@ -34,25 +34,25 @@ To run the application with Docker, including a Mongo database:
 1.  Build and Start Docker Containers
     Use Docker Compose to start both the Express application and Mongo database:
     `bash
-    docker-compose up --build
-    `
+docker-compose up --build
+`
     This command will:
 
-          - Build and start a Mongo container using the specified credentials.
-          - Build and start the Express container, connecting it to the database.
-          - The application will be accessible at http://localhost:3000 (or the port specified in .env).
+                  - Build and start a Mongo container using the specified credentials.
+                  - Build and start the Express container, connecting it to the database.
+                  - The application will be accessible at http://localhost:3000 (or the port specified in .env).
 
 2.  Stopping Containers
     To stop the running Docker containers:
     `bash
-    docker-compose down
-    `
+docker-compose down
+`
 
 3.  Resetting the Database Volume
     If you need to reset the Mongo database by removing the Docker volume, use:
     `bash
-    docker-compose down -v
-    `
+docker-compose down -v
+`
 
 ### Testing
 
