@@ -76,7 +76,8 @@ Important: Before running e2e tests, ensure that `.env.test` file exists in the 
    {
      "email": "admin@gmail.com",
      "password": "abc",
-     "roles": ["admin"]
+     "roles": ["admin"],
+     "referralCode": "IICF4E"
    }
    ```
 
